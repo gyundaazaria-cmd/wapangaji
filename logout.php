@@ -1,26 +1,10 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bootstrap.php';
-
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-if ($method !== 'POST') {
-    header('Allow: POST');
-    http_response_code(405);
-    exit('Use the sign-out button to end your session.');
-}
-
-$csrf = $_POST['csrf_token'] ?? null;
-if (!verify_csrf(is_string($csrf) ? $csrf : null)) {
-    if (Auth::user() === null) {
-        Auth::logout();
-        header('Location: index.php');
-        exit;
-    }
-
+require_once dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST' || !verify_csrf($_POST['csrf_token'] ?? '')) {
     http_response_code(419);
-    exit('Your sign-out request expired. Refresh the page and try again.');
+    exit('Ombi si halali. Tafadhali rudi nyuma na ujaribu tena.');
 }
-
 Auth::logout();
-header('Location: index.php');
+header('Location: loginpage.php');
 exit;
